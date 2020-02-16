@@ -1,7 +1,7 @@
 var express = require('express');
 var formidable = require('formidable');
-var path = require('path');
-var fs = require('fs');
+const path = require('path');
+var fs = require('fs-extra');
 
 var app = express();
 
@@ -19,8 +19,30 @@ app.post('/', function (req, res){
     form.on('fileBegin', function (name, file){
         file.path = __dirname + '/data/' + file.name;
     });
+
     
-    /*form.on('fileBegin', function (name, file){
+        /*var copyFile = (file,dir2)=>{
+            //include the fs,path modules
+            var fs = require('fs');
+            var path = require('path');
+            //get file name and add it to dir2
+            var f = path.basename(file);
+            var source = fs.createReadStream(file);
+            var dest = fs.createWriteStream(path.resolve(dir2,f));
+            source.pipe(dest);
+            source.on('end',function(){console.log('Sucessfully copied');});
+            source.on('error',function(err){
+               if(err){
+                 return console.error(err);
+               }
+               else {
+                  console.log("success!");
+               }
+           });
+         };
+     copyFile('/home/ubuntu/Downloads/simple-file-upload/data/fib.c','/home/ubuntu/go/src/github.com/elliotchance/c2go');*/
+   
+     /*form.on('fileBegin', function (name, file){
         file.path = __dirname + '/data/' + file.name;
         console.log('File Path:',file.path);
         var oldPath = file.path;
@@ -40,36 +62,25 @@ app.post('/', function (req, res){
     });*/
     
 
- /*form.on('fileBegin', function (name, file){
-    file.path = __dirname + '/data/' + file.name;
-    console.log('File Path:',file.path);
-    var copyFile = (file,dir2)=>{
-      //include the fs,path modules
-    var fs = require('fs');
-    var path = require('path');
-    //get file name and add it to dir2
-    var f = path.basename(file);
-    var source = fs.createReadStream(file);
-    var dest = fs.createWriteStream(path.resolve(dir2,f));
-    source.pipe(dest);
-    source.on('end',function(){console.log('Sucessfully copied');});
-    source.on('error',function(err){
-        if(err){
-          return console.error(err);
-        }
-        else {
-         console.log("success!");
-        }
-      });
-    };
-    copyFile('file.path','/home/ubuntu/go/src/github.com/elliotchance/c2go');
-   });
-   */
-    
 
     form.on('file', function (name, file){
         console.log('Uploaded ' + file.name);
     });
+    
+    form.on('file', function (name, file){
+    file.path = __dirname + '/data/' + file.name;
+    console.log('File Path:',file.path);
+    var oldPath = file.path;
+    var newPath = '/home/ubuntu/go/src/github.com/elliotchance'+'/c2go/'+file.name;
+    fs.move(oldPath,newPath,function(err){
+       if(err){
+         return console.error(err);
+       }
+       else {
+          console.log("success!");
+       }
+     });
+   });
 
     return res.json(200, {
 	result: 'Upload Success'
